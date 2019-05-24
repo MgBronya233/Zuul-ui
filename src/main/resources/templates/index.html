@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <!-- 引入组件库 -->
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <el-container>
+
+            <el-header>
+                <el-upload
+                        class="upload-demo"
+                        ref="upload"
+                        action="fileUpload"
+                        :multiple="false"
+                        :auto-upload="false"
+                        :on-success="submitUploadSuccess">
+                    <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
+                    <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload">上传到服务器</el-button>
+                </el-upload>
+            </el-header>
+
+            <el-main>
+                <el-table
+                        :data="filters"
+                        style="width: 100%">
+                    <el-table-column
+                            prop="filterName"
+                            label="FilterName">
+                    </el-table-column>
+                    <el-table-column
+                            prop="filterOrder"
+                            label="Order">
+                    </el-table-column>
+                    <el-table-column
+                            prop="filterType"
+                            label="FilterType">
+                    </el-table-column>
+                    <el-table-column
+                            prop="filterType"
+                            label="FilterType">
+                    </el-table-column>
+                    <el-table-column
+                            label="操作">
+                        <template slot-scope="scope">
+                            <el-button @click="deleteFilter(scope.row)" type="danger">删除</el-button>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </el-main>
+
+        </el-container>
+    </div>
+</body>
+<!-- 先引入 Vue -->
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<!-- 引入组件库 -->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script>
+    new Vue({
+        el: '#app',
+        data: function () {
+            return {
+                filters: [],
+                timer: '',
+            }
+        },
+        created() {
+            this.getFilters();
+        },
+        mounted() {
+            this.timer = setInterval(this.getFilters, 5000);
+        },
+        beforeDestroy() {
+            clearInterval(this.timer);
+        },
+        methods: {
+            getFilters() {
+                const vm = this;
+                jQuery.ajax({
+                    type:"get",
+                    url:"filters",
+                    success:function(data){
+                        vm.filters = data;
+                    },error:function(data){
+                        alert(data)
+                    }
+                });
+            },
+            submitUpload() {
+                this.$refs.upload.submit();
+            },
+            submitUploadSuccess() {
+                this.$refs.upload.clearFiles();
+                alert("上传成功!");
+            },
+
+            deleteFilter(data) {
+                const vm = this;
+                jQuery.ajax({
+                    type:"delete",
+                    url:"filter",
+                    data: {
+                        filterType: data.filterType,
+                        filterName: data.filterName,
+                    },
+                    success:function(data){
+                        alert("删除成功!");
+                        vm.getFilters();
+                    },error:function(data){
+                        alert("删除失败!");
+                        vm.getFilters();
+                    }
+                });
+            },
+        },
+    })
+</script>
+</html>

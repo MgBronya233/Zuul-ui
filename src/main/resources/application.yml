@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: zuul-service
+  thymeleaf:
+    cache: false
+server:
+  port: 10000
+zuul:
+  routes:
+    traditional-url:
+      path: /user/**
+      url: http://localhost:8099/user/
+  filter:
+    root: F:\groovy\filters
